@@ -4,12 +4,11 @@ import com.example.hmrback.auth.service.JwtService;
 import com.example.hmrback.persistence.entity.*;
 import com.example.hmrback.persistence.enums.RoleEnum;
 import com.example.hmrback.persistence.repository.*;
-import com.example.hmrback.utils.test.CommonTestUtils;
-import com.example.hmrback.utils.test.EntityTestUtils;
-import com.example.hmrback.utils.test.IntegrationTestUtils;
-import com.example.hmrback.utils.test.ModelTestUtils;
+import com.example.hmrback.utils.test.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,7 +57,6 @@ class RecipeControllerTest {
 
     private static String updateRecipeRequest;
     private static String createRecipeRequest;
-    private static String nonExistingRecipeFilters;
 
     @Autowired
     private StepRepository stepRepository;
@@ -70,7 +69,6 @@ class RecipeControllerTest {
     static void initAll() throws JsonProcessingException {
         updateRecipeRequest = IntegrationTestUtils.toJson(ModelTestUtils.buildRecipe(1L, false));
         createRecipeRequest = IntegrationTestUtils.toJson(ModelTestUtils.buildRecipe(1L, true));
-        nonExistingRecipeFilters = IntegrationTestUtils.toJson(CommonTestUtils.buildRecipeFilter());
     }
 
     @BeforeEach
@@ -108,10 +106,17 @@ class RecipeControllerTest {
         otherToken = jwtService.generateToken(otherUser);
 
         // Create a recipe authored by "user1"
-        recipeEntity = EntityTestUtils.buildRecipeEntity(1L);
+        recipeEntity = EntityTestUtils.buildRecipeEntity(3L);
         recipeEntity.setAuthor(user);
         recipeRepository.save(recipeEntity);
+
+        // Create another recipe (for search Integration Tests)
+        RecipeEntity otherRecipeEntity = EntityTestUtils.buildRecipeEntityIT();
+        otherRecipeEntity.setAuthor(otherUser);
+        recipeRepository.save(otherRecipeEntity);
     }
+
+    // TODO: complete a bit more the tests
 
     @Test
     @Order(1)
@@ -175,10 +180,31 @@ class RecipeControllerTest {
             .andExpect(status().isOk());
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(RecipeFilterEnum.class)
     @Order(7)
     @WithMockUser(username = "username1")
-    void searchRecipes_withNoRecipesFound() throws Exception {
+    void searchRecipes(RecipeFilterEnum filterEnum) throws Exception {
+        String recipeFilters = IntegrationTestUtils.toJson(CommonTestUtils.buildRecipeFilter(filterEnum, true));
+        mockMvc.perform(post("/hmr/api/recipes/search")
+                .header("Authorization", "Bearer " + userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(recipeFilters)
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "title,asc"))
+            .andExpect(status().isOk())
+            .andExpect(header().exists("X-Total-Count"))
+            .andExpect(jsonPath("$.content").exists())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.content.length()").value(1));
+    }
+
+    @ParameterizedTest
+    @EnumSource(RecipeFilterEnum.class)
+    @Order(8)
+    @WithMockUser(username = "username1")
+    void searchRecipes_withNoMatchingFilter(RecipeFilterEnum filterEnum) throws Exception {
         mockMvc.perform(post("/hmr/api/recipes/search")
                 .header("Authorization", "Bearer " + userToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -188,21 +214,5 @@ class RecipeControllerTest {
                 .param("sort", "title,asc"))
             .andExpect(status().isNoContent());
     }
-// TODO : with existing recipe in H2
-//    @Test
-//    @Order(7)
-//    @WithMockUser(username = "username1")
-//    void searchRecipes_withNoRecipesFound() throws Exception {
-//        mockMvc.perform(post("/hmr/api/recipes/search")
-//                .header("Authorization", "Bearer " + userToken)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(recipeFilters)
-//                .param("page", "0")
-//                .param("size", "10")
-//                .param("sort", "title,asc"))
-//            .andExpect(status().isOK())
-//            .andExpect(header().exists("X-Total-Count"))
-//            .andExpect(jsonPath("$.content").isArray());
-//    }
 
 }

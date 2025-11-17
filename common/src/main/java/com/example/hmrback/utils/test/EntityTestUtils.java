@@ -184,6 +184,22 @@ public class EntityTestUtils {
     }
 
     /**
+     * // TODO: integrate steps and ingredients
+     * Builds a RecipeEntity instance for integration testing purposes.
+     *
+     * @return RecipeEntity instance
+     */
+    public static RecipeEntity buildRecipeEntityIT() {
+        RecipeEntity recipeEntity = new RecipeEntity();
+        recipeEntity.setTitle(RECIPE_TITLE.formatted("IT"));
+        recipeEntity.setDescription(RECIPE_DESCRIPTION.formatted("IT"));
+        recipeEntity.setRecipeType(RecipeType.APPETIZER);
+        recipeEntity.setPreparationTime(20);
+        recipeEntity.setPublicationDate(LocalDate.now());
+        return recipeEntity;
+    }
+
+    /**
      * Builds a list of RecipeEntity instances for testing purposes.
      * If the requested count exceeds the number of available RecipeType values,
      * it limits the count to the number of RecipeType values.

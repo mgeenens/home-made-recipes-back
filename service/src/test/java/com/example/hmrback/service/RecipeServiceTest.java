@@ -9,6 +9,7 @@ import com.example.hmrback.persistence.repository.RecipeRepository;
 import com.example.hmrback.utils.test.CommonTestUtils;
 import com.example.hmrback.utils.test.EntityTestUtils;
 import com.example.hmrback.utils.test.ModelTestUtils;
+import com.example.hmrback.utils.test.RecipeFilterEnum;
 import com.querydsl.core.types.Predicate;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,7 +61,7 @@ class RecipeServiceTest extends BaseTU {
         recipe = ModelTestUtils.buildRecipe(NUMBER_1, true);
         recipeEntity = EntityTestUtils.buildRecipeEntity(NUMBER_1);
         recipeEntityList = EntityTestUtils.buildRecipeEntityList(3);
-        recipeFilter = CommonTestUtils.buildRecipeFilter();
+        recipeFilter = CommonTestUtils.buildRecipeFilter(RecipeFilterEnum.TITLE, true);
     }
 
     @Test

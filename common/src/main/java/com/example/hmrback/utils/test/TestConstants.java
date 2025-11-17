@@ -18,4 +18,6 @@ public class TestConstants {
 
     public static final String RECIPE_TITLE = "Recipe %s";
     public static final String RECIPE_DESCRIPTION = "Recipe description %s";
+
+    public static final String FAKE = "Fake";
 }

@@ -11,6 +11,8 @@ import com.example.hmrback.predicate.factory.RecipePredicateFactory;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static com.example.hmrback.exception.util.ExceptionMessageConstants.RECIPE_NOT_FOUND_EXCEPTION_MESSAGE;
+
 @Service
 public class RecipeService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RecipeService.class);
 
     // Repo
     private final RecipeRepository recipeRepository;
@@ -40,6 +46,8 @@ public class RecipeService {
         UserEntity author = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException(
             "L'auteur %s est introuvable".formatted(username)));
 
+        LOG.info("Création d'une recette par l'utilisateur {}", username);
+
         RecipeEntity recipeEntity = recipeMapper.toEntity(recipe);
         recipeEntity.setAuthor(author);
 
@@ -47,6 +55,9 @@ public class RecipeService {
     }
 
     public Page<Recipe> searchRecipes(RecipeFilter filter, Pageable pageable) {
+
+        LOG.info("Recherche de recettes avec filtres {}", filter);
+
         if (filter != null) {
             return recipeRepository.findAll(RecipePredicateFactory.fromFilters(filter), pageable).map(recipeMapper::toModel);
         }
@@ -59,6 +70,9 @@ public class RecipeService {
         Long recipeId,
         @Valid
         Recipe recipe) {
+
+        LOG.info("Update de la recette {}", recipeId);
+
         return recipeMapper.toModel(recipeRepository.saveAndFlush(recipeMapper.toEntity(recipe)));
     }
 
@@ -66,9 +80,12 @@ public class RecipeService {
     public void deleteRecipe(
         @NotNull
         Long id) {
+
+        LOG.info("Suppression de la recette {}", id);
+
         Optional<RecipeEntity> recipeEntity = recipeRepository.findById(id);
         recipeEntity.ifPresentOrElse(recipeRepository::delete, () -> {
-            throw new EntityNotFoundException("Recipe with id %s not found".formatted(id));
+            throw new EntityNotFoundException(RECIPE_NOT_FOUND_EXCEPTION_MESSAGE.formatted(id));
         });
     }
 }

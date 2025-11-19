@@ -28,7 +28,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.hmrback.utils.test.TestConstants.NOT_NULL_MESSAGE;
 import static com.example.hmrback.utils.test.TestConstants.NUMBER_1;
+import static com.example.hmrback.utils.test.TestConstants.SHOULD_BE_EQUALS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -81,7 +83,7 @@ class RecipeServiceTest extends BaseTU {
 
         Recipe result = service.createRecipe(recipe, "username1");
 
-        assertNotNull(result);
+        assertNotNull(result, NOT_NULL_MESSAGE.formatted("Recipe"));
 
         verify(userRepository, times(1)).findByUsername(anyString());
         verify(repository, times(1)).save(any(RecipeEntity.class));
@@ -89,26 +91,42 @@ class RecipeServiceTest extends BaseTU {
         verify(mapper, times(1)).toModel(any(RecipeEntity.class));
     }
 
-    // TODO: test createRecipe when user not found
-
     @Test
     @Order(2)
+    void createRecipe_whenUserNotFound_thenThrowException() {
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        when(repository.save(any())).thenReturn(recipeEntity);
+        when(mapper.toEntity(any())).thenReturn(recipeEntity);
+        when(mapper.toModel(any())).thenReturn(recipe);
+
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.createRecipe(recipe, "username1"));
+
+        assertNotNull(ex, NOT_NULL_MESSAGE.formatted("EntityNotFoundException"));
+
+        verify(userRepository, times(1)).findByUsername(anyString());
+        verify(repository, times(0)).save(any(RecipeEntity.class));
+        verify(mapper, times(0)).toEntity(any(Recipe.class));
+        verify(mapper, times(0)).toModel(any(RecipeEntity.class));
+    }
+
+    @Test
+    @Order(3)
     void shouldSearchRecipe() {
         when(repository.findAll(any(Predicate.class), any(Pageable.class))).thenReturn(new PageImpl<>(recipeEntityList));
         when(mapper.toModel(any())).thenReturn(recipe);
 
         Page<Recipe> result = service.searchRecipes(recipeFilter, PageRequest.of(0, 10));
 
-        assertNotNull(result);
-        assertNotNull(result.getContent());
-        assertEquals(3, result.getTotalElements());
+        assertNotNull(result, NOT_NULL_MESSAGE.formatted("Page<Recipe>"));
+        assertNotNull(result.getContent(), NOT_NULL_MESSAGE.formatted("Page<Recipe>.content"));
+        assertEquals(3, result.getTotalElements(),  SHOULD_BE_EQUALS_MESSAGE.formatted("Total elements", "3"));
 
         verify(repository, times(1)).findAll(any(Predicate.class), any(Pageable.class));
         verify(mapper, times(3)).toModel(any(RecipeEntity.class));
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void shouldSearchRecipe_whenFiltersIsNull_thenReturnEmptyList() {
         when(repository.findAll(any(Predicate.class), any(Pageable.class))).thenReturn(Page.empty());
 
@@ -123,7 +141,7 @@ class RecipeServiceTest extends BaseTU {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void shouldUpdateRecipe() {
         when(repository.saveAndFlush(any())).thenReturn(recipeEntity);
         when(mapper.toEntity(any())).thenReturn(recipeEntity);

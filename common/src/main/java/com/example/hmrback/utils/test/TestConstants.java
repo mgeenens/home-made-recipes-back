@@ -20,4 +20,10 @@ public class TestConstants {
     public static final String RECIPE_DESCRIPTION = "Recipe description %s";
 
     public static final String FAKE = "Fake";
+
+    // Assertion messages
+    public static final String SHOULD_BE_INITIALIZED_MESSAGE = "'%s' should be initialized";
+    public static final String NOT_NULL_MESSAGE = "'%s' shouldn't de null";
+    public static final String NOT_EMPTY_MESSAGE = "'%s' should not be empty";
+    public static final String SHOULD_BE_EQUALS_MESSAGE = "'%s' should be equal to %s";
 }

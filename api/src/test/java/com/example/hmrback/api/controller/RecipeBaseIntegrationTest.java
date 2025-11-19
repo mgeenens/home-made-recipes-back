@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
+import static com.example.hmrback.utils.test.TestConstants.SHOULD_BE_INITIALIZED_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
@@ -88,16 +89,21 @@ public class RecipeBaseIntegrationTest {
     @Test
     @Order(0)
     void contextLoads() {
-        assertNotNull(roleUser, "Role USER should be initialized");
-        assertNotNull(roleAdmin, "Role ADMIN should be initialized");
+        assertNotNull(roleUser, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Role USER"));
+        assertNotNull(roleAdmin, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Role ADMIN"));
 
-        assertNotNull(savedUser, "User should be initialized");
-        assertNotNull(savedAdmin, "Admin should be initialized");
-        assertNotNull(savedOtherUser, "Other User should be initialized");
+        assertNotNull(savedUser, SHOULD_BE_INITIALIZED_MESSAGE.formatted("User"));
+        assertNotNull(savedAdmin, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Admin"));
+        assertNotNull(savedOtherUser, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Other User"));
 
-        assertNotNull(adminToken, "Admin token should be initialized");
-        assertNotNull(userToken, "User token should be initialized");
-        assertNotNull(otherToken, "Other user token should be initialized");
+        assertNotNull(adminToken, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Admin token"));
+        assertNotNull(userToken, SHOULD_BE_INITIALIZED_MESSAGE.formatted("User token"));
+        assertNotNull(otherToken, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Other user token"));
+
+        assertNotNull(savedRecipe, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Saved Recipe"));
+        assertNotNull(savedOtherRecipe, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Saved other Recipe"));
+
+        assertNotNull(savedProducts, SHOULD_BE_INITIALIZED_MESSAGE.formatted("Saved products"));
     }
 
     public static void roleSetup(ApplicationContext context) {

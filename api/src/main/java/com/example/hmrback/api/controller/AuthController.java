@@ -4,6 +4,7 @@ import com.example.hmrback.model.request.AuthRequest;
 import com.example.hmrback.model.request.RegisterRequest;
 import com.example.hmrback.model.response.AuthResponse;
 import com.example.hmrback.auth.service.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
         @RequestBody
+        @Valid
         RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.ok(response);
@@ -32,6 +34,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
         @RequestBody
+        @Valid
         AuthRequest request) {
         AuthResponse response = authService.authenticate(request);
         return ResponseEntity.ok(response);

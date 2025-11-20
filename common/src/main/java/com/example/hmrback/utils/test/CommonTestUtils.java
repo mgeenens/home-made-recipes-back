@@ -1,15 +1,14 @@
 package com.example.hmrback.utils.test;
 
+import com.example.hmrback.model.request.AuthRequest;
 import com.example.hmrback.model.request.RecipeFilter;
+import com.example.hmrback.model.request.RegisterRequest;
 import com.example.hmrback.persistence.enums.IngredientType;
 import com.example.hmrback.persistence.enums.RecipeType;
 
 import java.util.List;
 
-import static com.example.hmrback.utils.test.TestConstants.FAKE;
-import static com.example.hmrback.utils.test.TestConstants.PRODUCT_NAME;
-import static com.example.hmrback.utils.test.TestConstants.RECIPE_DESCRIPTION;
-import static com.example.hmrback.utils.test.TestConstants.RECIPE_TITLE;
+import static com.example.hmrback.utils.test.TestConstants.*;
 
 public class CommonTestUtils {
 
@@ -32,5 +31,13 @@ public class CommonTestUtils {
             RecipeFilterEnum.AUTHOR_USERNAME.equals(filterEnum) ? userName : null,
             RecipeFilterEnum.INGREDIENT_NAME.equals(filterEnum) ? ingredientNames : null,
             RecipeFilterEnum.INGREDIENT_TYPE.equals(filterEnum) ? ingredientTypes : null);
+    }
+
+    public static RegisterRequest buildRegisterRequest() {
+        return new RegisterRequest(ModelTestUtils.buildUser(NUMBER_1), PASSWORD);
+    }
+
+    public static AuthRequest buildAuthRequest() {
+        return new AuthRequest(EMAIL, PASSWORD);
     }
 }

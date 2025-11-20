@@ -11,6 +11,8 @@ public class TestConstants {
     public static final String LAST_NAME = "lName %s";
     public static final String USERNAME = "username%s";
     public static final String EMAIL = "email.%s@test.com";
+    public static final String PASSWORD = "StrongP@ssw0rd!";
+    public static final String ENCODED_PASSWORD = "a1b2c3d4e5f6g7h8i9j0";
 
     public static final String PRODUCT_NAME = "Product %s";
 

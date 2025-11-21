@@ -28,4 +28,5 @@ public class TestConstants {
     public static final String NOT_NULL_MESSAGE = "'%s' shouldn't de null";
     public static final String NOT_EMPTY_MESSAGE = "'%s' should not be empty";
     public static final String SHOULD_BE_EQUALS_MESSAGE = "'%s' should be equal to %s";
+    public static final String EXCEPTION_MESSAGE_SHOULD_MATCH = "Exception messages should match";
 }

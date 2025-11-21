@@ -38,6 +38,6 @@ public class CommonTestUtils {
     }
 
     public static AuthRequest buildAuthRequest() {
-        return new AuthRequest(EMAIL, PASSWORD);
+        return new AuthRequest(EMAIL.formatted(NUMBER_1), PASSWORD);
     }
 }

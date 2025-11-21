@@ -22,6 +22,7 @@ import java.time.LocalDate;
 
 import static com.example.hmrback.exception.util.ExceptionMessageConstants.ROLE_NOT_FOUND_MESSAGE;
 import static com.example.hmrback.exception.util.ExceptionMessageConstants.USER_ALREADY_EXISTS_MESSAGE;
+import static com.example.hmrback.exception.util.ExceptionMessageConstants.USER_NOT_FOUND_EMAIL_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -62,12 +63,14 @@ public class AuthenticationService {
     }
 
     public AuthResponse authenticate(AuthRequest request) {
+        LOG.info("Authenticate user: {}", request.email());
+
+        UserEntity user = userRepository.findByEmail(request.email())
+            .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND_EMAIL_MESSAGE.formatted(request.email())));
+
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
-
-        UserEntity user = userRepository.findByEmail(request.email())
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         String token = jwtService.generateToken(user);
         return new AuthResponse(token);
